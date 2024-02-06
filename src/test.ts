@@ -1,12 +1,7 @@
-import path from 'path';
 import { NestJSTypeORMSeed } from './nestjs-typeorm-seeding';
 
 (async () => {
-  const configPath = path.resolve(
-    '.',
-    'src',
-    'nestjs-typeorm-seeding.config.ts',
-  );
+  const configPath = './src/nestjs-typeorm-seeding.config';
   const nestjsTypeORMSeed = new NestJSTypeORMSeed(configPath);
   await nestjsTypeORMSeed.init();
   const seeders = nestjsTypeORMSeed.list();

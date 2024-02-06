@@ -16,7 +16,7 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
     path: string;
   }> = [];
   constructor(configPath: string) {
-    this.configPath = configPath;
+    this.configPath = path.resolve('.', configPath);
   }
   /**
    * Load configuration, seeds from config path
@@ -25,16 +25,17 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
     const { SEED_PATHS, TYPE_ORM_MODULE_OPTIONS } = await import(
       this.configPath
     );
+    console.error('configPath', this.configPath);
     this.seedsPath = SEED_PATHS;
     const seedModule = SeedModule.register(TYPE_ORM_MODULE_OPTIONS);
     const app = await NestFactory.create<NestExpressApplication>(seedModule);
     const appInstance = app.select(seedModule);
     const patterns = [
-      fg.convertPathToPattern(
-        path.resolve('.', this.seedsPath, `*.seed.[js|ts]`),
-      ),
+      fg.convertPathToPattern(path.resolve('.', this.seedsPath, `*.seed.ts`)),
+      fg.convertPathToPattern(path.resolve('.', this.seedsPath, `*.seed.js`)),
     ];
     const seeders = await fg.async(patterns, {});
+    console.error('seeders', seeders, patterns);
     for (const path of seeders) {
       const importedSeed = await import(path);
       if (importedSeed.default) {
