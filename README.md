@@ -19,3 +19,9 @@
 ```sh
 npm i commander chalk
 ```
+
+2. [x] TypeORM with mysql2
+
+```sh
+npm install --save @nestjs/typeorm typeorm mysql2
+```

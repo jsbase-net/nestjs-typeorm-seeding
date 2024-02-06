@@ -2,15 +2,23 @@
 import { program } from 'commander';
 import { NestJSTypeORMSeed } from './nestjs-typeorm-seeding';
 import * as path from 'path';
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+
 import * as fg from 'fast-glob';
 import * as fs from 'fs';
 
-const configFilePath = path.resolve('.', '.nestjstypeormseeding.config.json');
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { NestFactory } from '@nestjs/core';
+import { SeedModule } from './seed.module';
 
-const readConfigFile = (): Promise<any> => {
+const seedingConfigOptionsFilePath = path.resolve(
+  '.',
+  'src',
+  'nestjs-typeorm-seeding.config.ts',
+);
+
+const readConfigFile = (configFile: string): Promise<any> => {
   return new Promise((resolve, reject) => {
-    fs.readFile(configFilePath, 'utf-8', (error, data) => {
+    fs.readFile(configFile, 'utf-8', (error, data) => {
       if (error) {
         return reject(error);
       }
@@ -20,22 +28,22 @@ const readConfigFile = (): Promise<any> => {
 };
 
 (async () => {
-  const configValues: {
-    seedsPath: string;
-    typeormOptions: TypeOrmModuleOptions;
-  } = await readConfigFile();
+  const { SEED_PATHS, TYPE_ORM_MODULE_OPTIONS } = await import(
+    seedingConfigOptionsFilePath
+  );
+  const seedModule = SeedModule.register(TYPE_ORM_MODULE_OPTIONS);
+  const app = await NestFactory.create<NestExpressApplication>(seedModule);
+  const appInstance = app.select(seedModule);
+
   const nestjsTypeORMSeed = new NestJSTypeORMSeed({
-    seedsPath: configValues.seedsPath,
-    typeormOptions: configValues.typeormOptions,
+    seedsPath: SEED_PATHS,
+    appInstance,
   });
-  console.log(nestjsTypeORMSeed.seedsPath, nestjsTypeORMSeed.typeormOptions);
+  console.log(nestjsTypeORMSeed.seedsPath, nestjsTypeORMSeed.appInstance);
   // check seeds
   const patterns = [
-    fg.convertPathToPattern(
-      path.resolve('.', configValues.seedsPath, `*.seed.[js|ts]`),
-    ),
+    fg.convertPathToPattern(path.resolve('.', SEED_PATHS, `*.seed.[js|ts]`)),
   ];
-  console.log(configValues);
 
   program
     .command('list')

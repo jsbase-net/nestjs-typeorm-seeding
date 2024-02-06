@@ -1,17 +1,18 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { INestJSTypeORMSeed } from './interfaces';
+import { INestApplicationContext } from '@nestjs/common';
 
 export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
   seedsPath: string;
-  typeormOptions: TypeOrmModuleOptions;
+  appInstance: INestApplicationContext;
   constructor({
     seedsPath,
-    typeormOptions,
+    appInstance,
   }: {
     seedsPath: string;
-    typeormOptions: TypeOrmModuleOptions;
+    appInstance: INestApplicationContext;
   }) {
     this.seedsPath = seedsPath;
-    this.typeormOptions = typeormOptions;
+    this.appInstance = appInstance;
   }
 }
