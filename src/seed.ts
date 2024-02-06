@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { program } from 'commander';
+import { Command } from 'commander';
 import { NestJSTypeORMSeed } from './nestjs-typeorm-seeding';
 import * as path from 'path';
 
@@ -28,24 +28,10 @@ const readConfigFile = (configFile: string): Promise<any> => {
 };
 
 (async () => {
-  const { SEED_PATHS, TYPE_ORM_MODULE_OPTIONS } = await import(
-    seedingConfigOptionsFilePath
-  );
-  const seedModule = SeedModule.register(TYPE_ORM_MODULE_OPTIONS);
-  const app = await NestFactory.create<NestExpressApplication>(seedModule);
-  const appInstance = app.select(seedModule);
-
-  const nestjsTypeORMSeed = new NestJSTypeORMSeed({
-    seedsPath: SEED_PATHS,
-    appInstance,
-  });
-  console.log(nestjsTypeORMSeed.seedsPath, nestjsTypeORMSeed.appInstance);
-  // check seeds
-  const patterns = [
-    fg.convertPathToPattern(path.resolve('.', SEED_PATHS, `*.seed.[js|ts]`)),
-  ];
+  const program = new Command();
 
   program
+    .argument('config')
     .command('list')
     .description('List all the TODO tasks')
     .action(() => {
