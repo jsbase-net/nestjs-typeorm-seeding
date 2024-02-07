@@ -1,6 +1,7 @@
 import path from 'path';
 import { UserEntity } from 'src/example/user.entity';
 
+const dirname = __dirname;
 const entities = [UserEntity];
 const SEED_PATHS = path.resolve(__dirname, 'seeds');
 const TYPE_ORM_MODULE_OPTIONS = {
@@ -12,6 +13,10 @@ const TYPE_ORM_MODULE_OPTIONS = {
   charset: 'utf8mb4_unicode_ci',
   // must not be synchronize automaticall, use data migration instea
   synchronize: false,
+  // migrations
+  migrations: [`${dirname}/migrations/*.ts`],
+  migrationsTableName: `migrations`,
 };
+const SEEDS_TABLE_NAME = 'nestjs_typeorm_seeding';
 
-export { SEED_PATHS, TYPE_ORM_MODULE_OPTIONS };
+export { SEED_PATHS, TYPE_ORM_MODULE_OPTIONS, SEEDS_TABLE_NAME };
