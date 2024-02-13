@@ -35,5 +35,22 @@ import { NestJSTypeORMSeed } from './nestjs-typeorm-seeding';
         process.exit(1);
       }
     });
+
+  program
+    .requiredOption('-c, --config <path>', 'path to your config file')
+    .requiredOption('-d, --dir <path>', 'path to your seeds directory')
+    .command('generate <seederName>')
+    .action(async (seederName: string) => {
+      console.log('options', program.opts());
+      if (program.opts().config) {
+        const nestjsTypeORMSeed = new NestJSTypeORMSeed(program.opts().config);
+        await nestjsTypeORMSeed.init();
+        await nestjsTypeORMSeed.generateSeeder(
+          seederName,
+          program.opts().dir || '',
+        );
+        process.exit(1);
+      }
+    });
   program.parse();
 })();

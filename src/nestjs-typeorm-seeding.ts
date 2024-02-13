@@ -121,11 +121,12 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
       await queryRunner.release();
     }
   }
-  async generateSeeder(name: string) {
+  async generateSeeder(name: string, seeedDir: string = '') {
     const currentTimeStamp = Date.now();
     const seederFileName = `${currentTimeStamp}-${name.toLocaleLowerCase()}.seed.ts`;
+    const templatePath = path.resolve(`${__dirname}`, 'seeder.template');
     const readFilePromise = new Promise((resolve, reject) => {
-      fs.readFile('./src/seeder.template', (err, data) => {
+      fs.readFile(templatePath, (err, data) => {
         if (err) {
           return reject(err);
         }
@@ -135,7 +136,7 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
         const content = data
           .toString()
           .replace('{SeederClassName}', capitalizedSeederClassName);
-        const newSeedFile = path.resolve(`${this.seedsPath}`, seederFileName);
+        const newSeedFile = path.resolve(seeedDir, seederFileName);
         fs.writeFile(newSeedFile, content, (err) => {
           if (err) {
             return reject(err);
