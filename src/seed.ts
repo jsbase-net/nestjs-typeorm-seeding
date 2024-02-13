@@ -13,8 +13,13 @@ import { NestJSTypeORMSeed } from './nestjs-typeorm-seeding';
       if (program.opts().config) {
         const nestjsTypeORMSeed = new NestJSTypeORMSeed(program.opts().config);
         await nestjsTypeORMSeed.init();
-        const seeders = nestjsTypeORMSeed.list();
-        console.log('list', seeders);
+        const seeders = await nestjsTypeORMSeed.list();
+        let output = '';
+        seeders.map((s, index) => {
+          const indexNumber = index + 1;
+          output += `${indexNumber}. ${s.isCompleted ? '[x]' : '[ ]'} ${s.name}`;
+        });
+        console.log(output);
         process.exit(1);
       }
     });

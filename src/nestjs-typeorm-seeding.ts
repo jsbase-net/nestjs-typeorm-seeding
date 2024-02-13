@@ -40,6 +40,8 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
     const patterns = [
       `${this.seedsPath}/*.seed.ts`,
       `${this.seedsPath}/*.seed.js`,
+      fg.convertPathToPattern(`${this.seedsPath}/*.seed.ts`),
+      fg.convertPathToPattern(`${this.seedsPath}/*.seed.js`),
     ];
     const seeders = await fg.async(patterns, {});
     console.error('seeders', seeders, patterns);
@@ -129,13 +131,25 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
     }
   }
   generateSeeder(name: string) {}
-  list() {
-    return this.seeders.map((seeder) => {
+  async list() {
+    const dataSource = this.appInstance.get(getDataSourceToken());
+    const seederRepository = dataSource.getRepository(SeedEntity);
+    const completedSeeds = (await seederRepository.find()).flatMap(
+      (seeder) => seeder.name,
+    );
+    const seeds = this.seeders.map((s) => {
       return {
-        name: seeder.name,
-        path: seeder.path,
+        name: s.name,
+        path: s.path,
+        seeder: s.seeder,
+        isCompleted: completedSeeds.includes(this.formatSeederName(s.name)),
       };
     });
+    return seeds;
+  }
+
+  formatSeederName(name: string) {
+    return name.toLowerCase().trim().replaceAll(' ', '');
   }
 
   async run(name: string = '') {
@@ -143,15 +157,22 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
     const queryRunner = dataSource.createQueryRunner();
     await queryRunner.startTransaction();
     const seederRepository = dataSource.getRepository(SeedEntity);
+    const seeders = await this.list();
+    const targetSeeders = seeders.filter((s) => {
+      const seederName = this.formatSeederName(name);
+      if (seederName.length > 0) {
+        return !s.isCompleted && s.name == seederName;
+      }
+      return !s.isCompleted;
+    });
     try {
       // run specific seeder or run all pending seeder
-      for (const s of this.seeders) {
-        console.log('tada', s.name, s.seeder);
+      for (const s of targetSeeders) {
         await s.seeder.run();
         console.log(`${s.name} at ${s.path} had been run successfully!`);
         // insert new record in seeder table
         await seederRepository.insert({
-          name: s.name,
+          name: this.formatSeederName(s.name),
         });
       }
       // commit transaction now:
