@@ -5,6 +5,7 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as fg from 'fast-glob';
 import * as path from 'path';
+import * as fs from 'fs';
 import { TypeOrmModuleOptions, getDataSourceToken } from '@nestjs/typeorm';
 import { SeedEntity } from './entities/seed.entity';
 import { Table, TableColumn } from 'typeorm';
@@ -120,7 +121,31 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
       await queryRunner.release();
     }
   }
-  generateSeeder(name: string) {}
+  async generateSeeder(name: string) {
+    const currentTimeStamp = Date.now();
+    const seederFileName = `${currentTimeStamp}-${name.toLocaleLowerCase()}.seed.ts`;
+    const readFilePromise = new Promise((resolve, reject) => {
+      fs.readFile('./src/seeder.template', (err, data) => {
+        if (err) {
+          return reject(err);
+        }
+        const seederClassName = `${name}${currentTimeStamp}`;
+        const capitalizedSeederClassName =
+          seederClassName.charAt(0).toUpperCase() + seederClassName.slice(1);
+        const content = data
+          .toString()
+          .replace('{SeederClassName}', capitalizedSeederClassName);
+        const newSeedFile = path.resolve(`${this.seedsPath}`, seederFileName);
+        fs.writeFile(newSeedFile, content, (err) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve(true);
+        });
+      });
+    });
+    await Promise.resolve(readFilePromise);
+  }
   async list() {
     const dataSource = this.appInstance.get(getDataSourceToken());
     const seederRepository = dataSource.getRepository(SeedEntity);

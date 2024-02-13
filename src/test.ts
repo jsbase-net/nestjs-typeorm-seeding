@@ -6,6 +6,7 @@ import { NestJSTypeORMSeed } from './nestjs-typeorm-seeding';
   await nestjsTypeORMSeed.init();
   const seeders = await nestjsTypeORMSeed.list();
   //await nestjsTypeORMSeed.run('tada');
+  await nestjsTypeORMSeed.generateSeeder('users');
   console.log(seeders);
   process.exit(1);
 })();

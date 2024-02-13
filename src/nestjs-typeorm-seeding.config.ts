@@ -1,3 +1,4 @@
+// nestjs-typeorm-seeding.config.ts
 import path from 'path';
 import { UserEntity } from 'src/example/user.entity';
 

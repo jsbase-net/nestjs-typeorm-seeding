@@ -1,0 +1,7 @@
+import { Seeder } from "@nextjsvietnam/nestjs-typeorm-seeding";
+export default class {SeederClassName} extends Seeder {
+  async run(): Promise<any> {
+    throw new Error('')
+    return;
+  }
+}

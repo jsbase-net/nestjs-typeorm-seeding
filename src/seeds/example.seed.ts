@@ -1,7 +1,6 @@
 import { getDataSourceToken } from '@nestjs/typeorm';
 import { Seeder } from '../seeder';
 import { UserEntity } from 'src/example/user.entity';
-import { INestApplicationContext } from '@nestjs/common';
 export default class ExampleSeeder extends Seeder {
   async run(): Promise<any> {
     const dataSource = this.appInstance.get(getDataSourceToken());
