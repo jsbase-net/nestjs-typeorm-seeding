@@ -53,7 +53,6 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
           path,
           importedSeed.default.name,
         );
-        console.log('seederInstance.appInstance', seederInstance.appInstance);
         this.seeders.push({
           seeder: seederInstance,
           name: seederInstance.name,
@@ -64,51 +63,50 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
     // create seeder table if not existed
     const dataSource = this.appInstance.get(getDataSourceToken());
     let queryRunner = dataSource.createQueryRunner();
+    // create table
+    const existedTable = await queryRunner.getTable(SEEDS_TABLE_NAME);
+    const seedsTableName = SEEDS_TABLE_NAME;
+    if (existedTable) {
+      return;
+    }
     await queryRunner.startTransaction();
     try {
-      // create table
-      const existedTable = await queryRunner.getTable(SEEDS_TABLE_NAME);
-      const seedsTableName = SEEDS_TABLE_NAME;
-      if (!existedTable) {
-        console.log('Try to create a seed table!');
+      console.log('Try to create a seed table!');
 
-        await queryRunner.createTable(
-          new Table({
-            name: seedsTableName,
-            columns: [
-              {
-                name: 'id',
-                type:
-                  this.typeOrmModuleOptions.type == 'mysql' ? 'int' : 'integer',
-                isPrimary: true,
-                isNullable: false,
-                isGenerated: true,
-                generationStrategy: 'increment',
-              },
-              {
-                name: 'name',
-                type: 'varchar',
-                length: '1000',
-              },
-              {
-                name: 'created_at',
-                type: 'datetime',
-                isNullable: false,
-                default: 'CURRENT_TIMESTAMP',
-              },
-              {
-                name: 'updated_at',
-                type: 'datetime',
-                isNullable: false,
-                default: 'CURRENT_TIMESTAMP',
-              },
-            ],
-          }),
-        );
-        console.log(`${seedsTableName} has been created!`);
-      }
-      // run specific seeder or run all pending seeder
-
+      await queryRunner.createTable(
+        new Table({
+          name: seedsTableName,
+          columns: [
+            {
+              name: 'id',
+              type:
+                this.typeOrmModuleOptions.type == 'mysql' ? 'int' : 'integer',
+              isPrimary: true,
+              isNullable: false,
+              isGenerated: true,
+              generationStrategy: 'increment',
+            },
+            {
+              name: 'name',
+              type: 'varchar',
+              length: '1000',
+            },
+            {
+              name: 'created_at',
+              type: 'datetime',
+              isNullable: false,
+              default: 'CURRENT_TIMESTAMP',
+            },
+            {
+              name: 'updated_at',
+              type: 'datetime',
+              isNullable: false,
+              default: 'CURRENT_TIMESTAMP',
+            },
+          ],
+        }),
+      );
+      console.log(`${seedsTableName} has been created!`);
       // commit transaction now:
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -120,14 +118,6 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
       console.error('Seeds run successfully!');
       // you need to release query runner which is manually created:
       await queryRunner.release();
-    }
-    // query db
-    queryRunner = dataSource.createQueryRunner();
-    const existedTable = await queryRunner.getTable(SEEDS_TABLE_NAME);
-    if (existedTable) {
-      const seedRepository = dataSource.getRepository(SeedEntity);
-      const rows = await seedRepository.find({});
-      console.log(rows);
     }
   }
   generateSeeder(name: string) {}
@@ -165,6 +155,9 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
       }
       return !s.isCompleted;
     });
+    if (targetSeeders.length === 0) {
+      return;
+    }
     try {
       // run specific seeder or run all pending seeder
       for (const s of targetSeeders) {

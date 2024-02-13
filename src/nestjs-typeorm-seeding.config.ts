@@ -14,7 +14,7 @@ const TYPE_ORM_MODULE_OPTIONS = {
   // must not be synchronize automaticall, use data migration instea
   synchronize: false,
   // migrations
-  migrations: [`${dirname}/migrations/*.ts`],
+  migrations: [`${dirname}/database/migrations/*.ts`],
   migrationsTableName: `migrations`,
 };
 const SEEDS_TABLE_NAME = 'nestjs_typeorm_seeding';

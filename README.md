@@ -47,3 +47,10 @@ npm i commander chalk
 ```sh
 npm install --save @nestjs/typeorm typeorm mysql2
 ```
+
+3. [x] Test
+
+```sh
+npm run build
+node ./dist/seed.js -c ./dist/nestjs-typeorm-seeding.config.js list
+```
