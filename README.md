@@ -6,10 +6,10 @@
 
 **Create config file**
 
-> **nestjs-typeorm-seeding.config.ts**
+> **./src/nestjs-typeorm-seeding.config.ts**
 
 ```ts
-// nestjs-typeorm-seeding.config.ts
+// ./src/nestjs-typeorm-seeding.config.ts
 import path from 'path';
 import { UserEntity } from 'src/example/user.entity';
 
@@ -54,4 +54,5 @@ npm install --save @nestjs/typeorm typeorm mysql2
 npm run build
 node ./dist/seed.js -c ./dist/nestjs-typeorm-seeding.config.js list
 node ./dist/seed.js -c ./dist/nestjs-typeorm-seeding.config.js -d ./src/seeds generate users
+node ./dist/seed.js -c ./dist/nestjs-typeorm-seeding.config.js run
 ```

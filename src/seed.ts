@@ -38,7 +38,7 @@ import { NestJSTypeORMSeed } from './nestjs-typeorm-seeding';
 
   program
     .requiredOption('-c, --config <path>', 'path to your config file')
-    .requiredOption('-d, --dir <path>', 'path to your seeds directory')
+    .option('-d, --dir <path>', 'path to your seeds directory')
     .command('generate <seederName>')
     .action(async (seederName: string) => {
       console.log('options', program.opts());
