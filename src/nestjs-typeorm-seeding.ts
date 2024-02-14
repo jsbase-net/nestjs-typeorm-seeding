@@ -29,13 +29,15 @@ export class NestJSTypeORMSeed implements INestJSTypeORMSeed {
    * Load configuration, seeds from config path
    */
   async init() {
-    const { SEED_PATHS, TYPE_ORM_MODULE_OPTIONS } = await import(
-      this.configPath
-    );
+    const { SEED_PATHS, TYPE_ORM_MODULE_OPTIONS, SEEDS_PROVIDERS } =
+      await import(this.configPath);
     console.error('configPath', this.configPath);
     this.seedsPath = SEED_PATHS;
     this.typeOrmModuleOptions = TYPE_ORM_MODULE_OPTIONS;
-    const seedModule = SeedModule.register(TYPE_ORM_MODULE_OPTIONS);
+    const seedModule = SeedModule.register({
+      options: TYPE_ORM_MODULE_OPTIONS,
+      providers: SEEDS_PROVIDERS,
+    });
     const app = await NestFactory.create<NestExpressApplication>(seedModule);
     this.appInstance = app.select(seedModule);
     const patterns = [

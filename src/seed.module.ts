@@ -1,11 +1,17 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Module, Provider } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { SeedEntity } from './entities/seed.entity';
 
+type SeedModuleOptions = {
+  options: TypeOrmModuleOptions;
+  providers?: Provider[];
+};
+
 @Module({})
 export class SeedModule {
-  static register(options: TypeOrmModuleOptions): DynamicModule {
+  static register(opts: SeedModuleOptions): DynamicModule {
+    const { options, providers } = opts;
     return {
       module: SeedModule,
       imports: [
@@ -26,6 +32,7 @@ export class SeedModule {
           },
         }),
       ],
+      providers,
     };
   }
 }
