@@ -9,9 +9,10 @@
 > **./src/nestjs-typeorm-seeding.config.ts**
 
 ```ts
-// ./src/nestjs-typeorm-seeding.config.ts
+// nestjs-typeorm-seeding.config.ts
 import path from 'path';
 import { UserEntity } from 'src/example/user.entity';
+import { UserRepository } from './repositories/user-repository';
 
 const dirname = __dirname;
 const entities = [UserEntity];
@@ -30,8 +31,14 @@ const TYPE_ORM_MODULE_OPTIONS = {
   migrationsTableName: `migrations`,
 };
 const SEEDS_TABLE_NAME = 'nestjs_typeorm_seeding';
+const SEEDS_PROVIDERS = [UserRepository];
 
-export { SEED_PATHS, TYPE_ORM_MODULE_OPTIONS, SEEDS_TABLE_NAME };
+export {
+  SEED_PATHS,
+  TYPE_ORM_MODULE_OPTIONS,
+  SEEDS_TABLE_NAME,
+  SEEDS_PROVIDERS,
+};
 ```
 
 ## Development
